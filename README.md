@@ -48,9 +48,11 @@ py -m pip install -r requirements.txt
 
 - Once the project and environment are setup, you can launch it by opening **sujet_upper_body_imitation.ipynb** with __Visual Studio__ or __Jupyter__.
 
-- You have to execute the cells inside the notebook to make it work.
-
 - (You have to link your **Visual Studio** or **Jupyter** with your created environment)
+
+- Launch Coppelia Sim on your computer and open the specific scene __REMOTE_API_TEMPFILE_6057__ located at __./Poppy/scenes/REMOTE_API_TEMPFILE_6057.ttt__.
+
+- You can execute now cells inside your notebook to make some changes on your Coppelia Sim.
 
 ## Ressources
 
