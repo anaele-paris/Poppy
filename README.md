@@ -40,6 +40,12 @@ py -m venv venv
 
 <sub>Note: You can use Virtual Studio to create directly your virtual environment with interface.</sub>
 
+- Install the requirements:
+
+```
+py -m pip install -r requirements.txt
+```
+
 ## How to launch?
 
 - Once the project is setup, you can launch it using our initial script:
