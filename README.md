@@ -24,7 +24,7 @@ git clone https://github.com/PierreBio/Poppy.git
 cd Poppy
 ```
 
-- Install [Python v3.8](https://www.python.org/downloads/release/python-3810/) or use pyenv to directly create your environment.
+- Install [Python v3.8](https://www.python.org/downloads/release/python-3810/) (or use __pyenv__ or __Visual Studio__ to create your environment).
 
 - Create a virtual environment using **Python v3.8**:
 
@@ -38,8 +38,6 @@ py -m venv venv
 .\venv\Scripts\activate
 ```
 
-<sub>Note: You can use Virtual Studio to create directly your virtual environment with interface.</sub>
-
 - Install the requirements:
 
 ```
@@ -48,11 +46,11 @@ py -m pip install -r requirements.txt
 
 ## How to launch?
 
-- Once the project is setup, you can launch it using our initial script:
+- Once the project and environment are setup, you can launch it by opening **sujet_upper_body_imitation.ipynb** with __Visual Studio__ or __Jupyter__.
 
-```
-py -m sujet_upper_body_imitation
-```
+- You have to execute the cells inside the notebook to make it work.
+
+- (You have to link your **Visual Studio** or **Jupyter** with your created environment)
 
 ## Ressources
 
