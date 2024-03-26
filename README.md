@@ -4,7 +4,7 @@
 
 This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis**.
 
-<sub>Made with __Python v3.8__ and __Coppelia Sim__ </sub>
+<sub>Made with __Python v3.8.10__ and __Coppelia Sim__ </sub>
 
 ## Project
 
@@ -24,9 +24,9 @@ git clone https://github.com/PierreBio/Poppy.git
 cd Poppy
 ```
 
-- Install [Python v3.8](https://www.python.org/downloads/release/python-3810/) (or use __pyenv__ or __Visual Studio__ to create your environment).
+- Install [Python v3.8.10](https://www.python.org/downloads/release/python-3810/) (or use __pyenv__ or __Visual Studio__ to create your environment).
 
-- Create a virtual environment using **Python v3.8**:
+- Create a virtual environment using **Python v3.8.10**:
 
 ```
 py -m venv venv
