@@ -272,7 +272,16 @@ def build_adj_matrix(topology, fill_diag=False):
     return adj_matrix
 
 def reorient_skeleton(skeleton, topology):
-
+    '''ABC 
+    Skeleton reorientation to align torso to vertical ans hips to horizontal
+    Measures the back orientation with pelvis->chest axis (joints 0->7) and rotates the skeleton accordingly.
+    Measures the hip orientation with pelvis-> left hip (joint 0->1) and rotates the skeleton accordingly.
+    Parameters:
+        skeleton: torch Tensor of shape (batch_size, num_joints, 3)
+        topology: python list giving the parent of every node
+    Returns:
+        new_skeleton: torch Tensor of shape (batch_size, num_joints, 3)
+    '''
     batch_size, n_joints, _ = skeleton.shape
 
     # Measure skeleton bone lengths

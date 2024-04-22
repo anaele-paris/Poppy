@@ -5,6 +5,10 @@ mp_pose = mp.solutions.pose
 
 
 def skeleton_from_blazepose_landmarks(landmarks):
+    '''ABC -
+    Retrieve the Poppy skeleton (17 joints) from the landmarks detected by the BlazePose model (32 joints).
+    see joint_poppy_blazepose.png for the correspondance between the two skeletons.
+    '''
     landmarks = torch.Tensor([
         [lm.x, lm.y, lm.z] for lm in landmarks
     ])
