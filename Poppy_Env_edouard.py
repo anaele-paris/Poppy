@@ -59,10 +59,13 @@ class PoppyEnv(gym.Env):
         self.joints_limits = {
             # pivots to the left (>0) or to the right (<0) around the z-axis
             'abs_z': (-90.0, 90.0),
+            # 'abs_z': (0.0, 0.0),
             # bends forward (>0) or backward (<0)
             'bust_y': (-27.0, 22.0),
+            # 'bust_y': (0.0, 0.0),
             # leans to the left (>0) or to the right (<0)
             'bust_x': (-20.0, 20.0),
+            # 'bust_x': (0.0, 0.0),
 
             'r_shoulder_x': (0.0, 180.0),     # lifts elbow up or down
             # moves shoulder forward or backward
@@ -147,10 +150,10 @@ class PoppyEnv(gym.Env):
         Out put : None
         Note poppy_goto(joints_reset) is equivalent to poppy_reset()
         '''
-        for m in self.poppy.motors:
-            if m.name in joints_to_move:
+        for i, m in enumerate(self.poppy.motors):
+            if not np.isnan(joints_to_move[i]):
                 # wait=False to allow parallel movements
-                m.goto_position(joints_to_move[m.name], wait=False)
+                m.goto_position(joints_to_move[i], 3, wait=False)
 
         # wait for moovements to be executed
         time.sleep(wait_for)
@@ -223,13 +226,13 @@ class PoppyEnv(gym.Env):
         '''reset Poppy to the initial state'''
         if seed is not None:
             np.random.seed(seed)
-        joint_pos = {'l_elbow_y': 90.0,  # if 90 will reset with arms straight along hips
+        joint_pos = {'l_elbow_y': 0.0,  # if 90 will reset with arms straight along hips
                      'head_y': 0.0,
                      'r_arm_z': 0.0,
                      'head_z': 0.0,
                      'r_shoulder_x': 0.0,
                      'r_shoulder_y': 0.0,
-                     'r_elbow_y': 90.0,  # if 90 will reset with arms straight along hips
+                     'r_elbow_y': 0.0,  # if 90 will reset with arms straight along hips
                      'l_arm_z': 0.0,
                      'abs_z': 0.0,
                      'bust_y': 0.0,
@@ -362,6 +365,7 @@ class PoppyEnv(gym.Env):
         files = os.listdir(path)
         for file in files:
             if file.endswith("poppy_skeletons.pt"):
+                print("loading targets from : ", file)
                 self.targets = torch.load(path+file)
                 break
 
