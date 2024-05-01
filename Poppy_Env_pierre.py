@@ -146,17 +146,10 @@ class PoppyEnvPierre(gym.Env):
 
 
     def get_observation(self):
-        # Get observations
-        print(self.poppy)
-        print(self.poppy.l_arm_chain.position)
-        targets_obs = np.r_[self.poppy.l_arm_chain.position, self.poppy.r_arm_chain.position]
-        l_joints_obs = self.poppy.l_arm_chain.joints_position
-        r_joints_obs = self.poppy.r_arm_chain.joints_position
-        # Combine all observations into a single numpy array
-        obs = np.concatenate((targets_obs, l_joints_obs, r_joints_obs))
-        print("obs : ", obs)
-        print("shape obs :", obs.shape)
-        return obs
+        left_arm_pos = self.poppy.l_arm_chain.position
+        right_arm_pos = self.poppy.r_arm_chain.position
+        obs = np.concatenate((left_arm_pos, right_arm_pos))
+        return np.float32(obs)
 
 
     def get_poppy_skeletons(self, skeletons):
