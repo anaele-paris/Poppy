@@ -134,10 +134,13 @@ class PoppyEnvPierre(gym.Env):
             None
         Note: poppy_goto(joints_reset) is equivalent to poppy_reset().
         """
+        print(joints_to_move)
         # Iterate over each joint and the desired position in the dictionary
-        for i, m in enumerate(self.poppy.motors):
-            if not np.isnan(joints_to_move[i]):
-                m.goto_position(joints_to_move[i], 3, wait=False)
+        for motor in self.poppy.motors:
+            joint_name = motor.name
+            position = joints_to_move.get(joint_name)
+            if position is not None and not np.isnan(position):
+                motor.goto_position(position, 3, wait=False)
 
         time.sleep(wait_for)
 
@@ -152,6 +155,7 @@ class PoppyEnvPierre(gym.Env):
         # Combine all observations into a single numpy array
         obs = np.concatenate((targets_obs, l_joints_obs, r_joints_obs))
         print("obs : ", obs)
+        print("shape obs :", obs.shape)
         return obs
 
 
@@ -208,9 +212,18 @@ class PoppyEnvPierre(gym.Env):
         Output :
             targets : list of targets (n_frames, n_targets, 3) in skeleton like format
         '''
+        print("target skeleton")
+        print(target_skeletons)
+        print(target_skeletons.shape)
+
         if end_effector_indices is None:
             end_effector_indices = [13, 16]
-        return target_skeletons[:, end_effector_indices]
+
+        print("target skeleton à retourner")
+        print(target_skeletons[end_effector_indices])
+        print(target_skeletons[end_effector_indices].shape)
+
+        return target_skeletons[end_effector_indices]
 
     def reset(self, seed=None, **kwargs):
         '''reset Poppy to the initial state'''
@@ -285,12 +298,17 @@ class PoppyEnvPierre(gym.Env):
         # flatten targets and observations
         # obs = obs.flatten()
         # target = target.flatten()
-        target = self.get_targets_from_skeleton(
-            np.expand_dims(target.numpy(), axis=0))
+        target_coordinates = self.get_targets_from_skeleton(target)
 
-        # calculate the error distance for left and right end_effector
-        l_dis = np.linalg.norm(obs[:3] - target[0][0])
-        r_dis = np.linalg.norm(obs[3:] - target[0][1])
+        # Extract the relevant parts of the observation
+        obs_targets = obs[:3]  # Select the first three coordinates of the observation
+
+        # Calculate the error distances
+        target_coordinates_numpy = target_coordinates.numpy()
+
+        # Calculer la distance avec les tableaux NumPy
+        r_dis = np.linalg.norm(obs_targets - target_coordinates_numpy[0][1])
+        l_dis = np.linalg.norm(obs_targets - target_coordinates_numpy[0][0])
 
         # calculate reward
         l_reward = np.exp(- alpha * l_dis) if l_dis <= threshold else 0
