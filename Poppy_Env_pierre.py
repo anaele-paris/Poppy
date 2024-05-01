@@ -134,13 +134,13 @@ class PoppyEnvPierre(gym.Env):
             None
         Note: poppy_goto(joints_reset) is equivalent to poppy_reset().
         """
-        print(joints_to_move)
+        print("JOINTS TO MOVE", joints_to_move)
         # Iterate over each joint and the desired position in the dictionary
         for motor in self.poppy.motors:
             joint_name = motor.name
             position = joints_to_move.get(joint_name)
             if position is not None and not np.isnan(position):
-                motor.goto_position(position, 3, wait=False)
+                motor.goto_position(position, 3, wait=True)
 
         time.sleep(wait_for)
 
