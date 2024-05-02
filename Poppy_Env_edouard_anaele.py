@@ -368,4 +368,4 @@ class PoppyEnv(gym.Env):
         else:
             print("File must be in a poppy skeletons format")
 
-        return (self, target_skeletons, end_effector_indices=None)
+        return self.get_targets_from_skeleton(self.targets, end_effector_indices=None)
