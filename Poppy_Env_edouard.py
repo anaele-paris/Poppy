@@ -57,35 +57,19 @@ class PoppyEnv(gym.Env):
 
         # Define Poppy's moovements limits (possible angles for each joints)
         self.joints_limits = {
-            # pivots to the left (>0) or to the right (<0) around the z-axis
-            'abs_z': (-90.0, 90.0),
-            # 'abs_z': (0.0, 0.0),
-            # bends forward (>0) or backward (<0)
-            'bust_y': (-27.0, 22.0),
-            # 'bust_y': (0.0, 0.0),
-            # leans to the left (>0) or to the right (<0)
-            'bust_x': (-20.0, 20.0),
-            # 'bust_x': (0.0, 0.0),
-
-            'r_shoulder_x': (0.0, 180.0),     # lifts elbow up or down
-            # moves shoulder forward or backward
-            'r_shoulder_y': (-210.0, 65.0),
-            # rotates the arm around the shoulder-elbow axis
-            'r_arm_z': (-50.0, 60.0),
-            # straightens arms (90 full extension => -60 bent elbow)
-            'r_elbow_y': (-60.0, 90.0),
-
-            'l_shoulder_x': (0.0, 180.0),     # lifts elbow up or down
-            # moves shoulder forward or backward
-            'l_shoulder_y': (-210.0, 65.0),
-            # rotates the arm around the shoulder-elbow axis
-            'l_arm_z': (-50.0, 60.0),
-            'l_elbow_y': (-60, 90),         # bends the elbow
-
-            # fix - points the head down (>0) or up(<0) (min -20, max 20)                                   #
+            'l_elbow_y': (-60, 90),
             'head_y': (0.0, 0.0),
-            # fix - rotates the head to the left (>0) or to the right (<0)  (min -90, max 90)
+            'r_arm_z': (-50.0, 60.0),
             'head_z': (0.0, 0.0),
+            'r_shoulder_x': (0.0, 180.0),
+            'r_shoulder_y': (-210.0, 65.0),
+            'r_elbow_y': (-60.0, 90.0),
+            'l_arm_z': (-50.0, 60.0),
+            'abs_z': (0.0, 0.0),
+            'bust_y': (0.0, 0.0),
+            'bust_x': (0.0, 0.0),
+            'l_shoulder_x': (0.0, 180.0),
+            'l_shoulder_y': (-210.0, 65.0),
         }
         self.low_limits = np.array(
             [lim[0] for lim in self.joints_limits.values()], dtype=np.float32)
@@ -112,7 +96,7 @@ class PoppyEnv(gym.Env):
     # def seed(self, seed=None):
     #     return [np.random.seed(seed)]
 
-    def poppy_goto(self, joints_to_move, wait_for=3):
+    def poppy_goto(self, joints_to_move, wait_for=5):
         '''function to move poppy to a specific position
         Input : dictionary of an action defined by joints to move (specify only joints to move)
         joints_to_move = {
@@ -150,10 +134,33 @@ class PoppyEnv(gym.Env):
         Out put : None
         Note poppy_goto(joints_reset) is equivalent to poppy_reset()
         '''
+        def scale_value(value, min_in, max_in, min_out, max_out):
+            # Mise à l'échelle de la valeur d'entrée
+            scaled_value = (value - min_in) / (max_in - min_in)
+            # Transformation à la plage de sortie
+            scaled_value = scaled_value * (max_out - min_out) + min_out
+            return scaled_value
+        print("joints_to_move : ", joints_to_move)
         for i, m in enumerate(self.poppy.motors):
-            if not np.isnan(joints_to_move[i]):
+            if not np.isnan(joints_to_move[i]) and self.action_space.high[i] - self.action_space.low[i] != 0:
+                print(
+                    m.name, self.action_space.low[i], self.action_space.high[i])
+                action = (joints_to_move[i]+1)/2 * (self.action_space.high[i] -
+                                                    self.action_space.low[i]) + self.action_space.low[i]
+                # if joints_to_move[i] > 0 and self.action_space.high[i] != 0:
+                #     action = joints_to_move[i]*self.action_space.high[i]
+                # elif joints_to_move[i] < 0 and self.action_space.low[i] != 0:
+                #     action = -joints_to_move[i]*self.action_space.low[i]
+                # else:
+                #     action = 0.
+
+                # action = scale_value(
+                #     joints_to_move[i], -1, 1, self.action_space.low[i], self.action_space.high[i])
+                # if action >= self.action_space.low[i] and action <= self.action_space.high[i]:
                 # wait=False to allow parallel movements
-                m.goto_position(joints_to_move[i], 3, wait=False)
+                print(m.name, joints_to_move[i], action)
+                # m.goto_position(joints_to_move[i], 3, wait=False)
+                m.goto_position(action, 3, wait=False)
 
         # wait for moovements to be executed
         time.sleep(wait_for)
@@ -224,6 +231,7 @@ class PoppyEnv(gym.Env):
 
     def reset(self, seed=None, **kwargs):
         '''reset Poppy to the initial state'''
+        print("coucou")
         if seed is not None:
             np.random.seed(seed)
         joint_pos = {'l_elbow_y': 0.0,  # if 90 will reset with arms straight along hips
@@ -257,7 +265,7 @@ class PoppyEnv(gym.Env):
                     self.poppy.r_arm_chain.position]
 
         info = {}
-
+        print("Initial state:", obs)
         return np.float32(obs), info
 
     def reward(self, obs, target, threshold=0.3, alpha=10):
@@ -317,10 +325,10 @@ class PoppyEnv(gym.Env):
         print("reward : ", reward)
 
         # Update current step, info and episode
-        self.current_step += 5
+        self.current_step += 1
         print("current step : ", self.current_step)
 
-        info = {'episode': self.episodes,
+        info = {'episode': self.episodes+1,
                 'step': self.current_step,
                 'reward': reward}
         self.infos.append(info)
