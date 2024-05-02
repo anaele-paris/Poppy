@@ -64,19 +64,19 @@ class PoppyEnv(gym.Env):
 
         # Define Poppy's moovements limits (possible angles for each joints)
         self.joints_limits = {
-            'l_elbow_y': (-60, 90),         # bends the elbow
+            'l_elbow_y': (-45, 90),         # (-60, 90) bends the elbow
             'head_y': (0.0, 0.0),           # fix (min -90, max 90) - points the head down (>0) or up(<0)  
-            'r_arm_z': (-50.0, 60.0),       # rotates the arm around the shoulder-elbow axis 
+            'r_arm_z': (-45.0, 55.0),       # (-50.0, 60.0) rotates the arm around the shoulder-elbow axis 
             'head_z': (0.0, 0.0),           # fix (min -90, max 90) - rotates the head to the left (>0) or to the right (<0)  
-            'r_shoulder_x': (-180.0, 15.0), # lifts elbow up or down
-            'r_shoulder_y': (-210.0, 65.0), # moves shoulder forward or backward
-            'r_elbow_y': (-60.0, 90.0),     # straightens arms (90 full extension => -60 bent elbow)
-            'l_arm_z': (-50.0, 60.0),       # rotates the arm around the shoulder-elbow axis
-            'abs_z': (-90.0, 90.0),         # pivots to the left (>0) or to the right (<0) around the z-axis
+            'r_shoulder_x': (-180.0, 5.0), # (-180.0, 15.0) lifts elbow up or down
+            'r_shoulder_y': (-180.0, 50.0), # (-210.0, 65.0) moves shoulder forward or backward
+            'r_elbow_y': (-45.0, 90.0),     # (-60.0, 90.0)straightens arms (90 full extension => -60 bent elbow)
+            'l_arm_z': (-30.0, 30.0),       # (-50.0, 60.0) rotates the arm around the shoulder-elbow axis
+            'abs_z': (-45.0, 45.0),         # (-90.0, 90.0) pivots to the left (>0) or to the right (<0) around the z-axis
             'bust_y': (0.0, 0.0),           # fix (min -27, max 22) - bends forward (>0) or backward (<0)
             'bust_x': (0.0, 0.0),           # fix (min -20, max 20) - leans to the left (>0) or to the right (<0)
-            'l_shoulder_x': (-15.0, 180.0), # lifts elbow up or down
-            'l_shoulder_y': (-210.0, 65.0), # moves shoulder forward or backward
+            'l_shoulder_x': (-5.0, 180.0),  # (-15.0, 180.0)lifts elbow up or down
+            'l_shoulder_y': (-180.0, 65.0), # (-180.0, 65.0) moves shoulder forward or backward
           }
 
         self.low_limits = np.array(
@@ -144,11 +144,11 @@ class PoppyEnv(gym.Env):
         '''
         for i, m in enumerate(self.poppy.motors):
             if not np.isnan(joints_to_move[i]):
-                # wait=False to allow parallel movements
-                m.goto_position(joints_to_move[i], 3, wait=False)
+                # wait=False to allow parallel movements (unquote time.sleep(wait_for) to wait for movements to be executed)
+                m.goto_position(joints_to_move[i], 3, wait=True)
 
         # wait for moovements to be executed
-        time.sleep(wait_for)
+        # time.sleep(wait_for)
 
     def get_observation(self):
         # Get observations
@@ -235,7 +235,7 @@ class PoppyEnv(gym.Env):
 
         for m in self.poppy.motors:
             # wait=False to allow parallel movements
-            m.goto_position(joint_pos[m.name], 1, wait=False)
+            m.goto_position(joint_pos[m.name], 1, wait=True)
 
         # wait 3 seconds for moovements to be executed
         time.sleep(3)
@@ -282,9 +282,9 @@ class PoppyEnv(gym.Env):
         # calculate reward
         l_reward = np.exp(- alpha * l_dis) if l_dis <= threshold else 0
         r_reward = np.exp(- alpha * r_dis) if r_dis <= threshold else 0
-        l_z_reward = -10 if obs[2] < 0.01 else 0
-        r_z_reward = -10 if obs[5] < 0.01 else 0
-        reward = (l_reward + r_reward)*10/2 + l_z_reward + r_z_reward
+        # l_z_reward = -10 if obs[2] < 0.01 else 0
+        # r_z_reward = -10 if obs[5] < 0.01 else 0
+        reward = (l_reward + r_reward)*10/2 # + l_z_reward + r_z_reward
 
         return reward
 
