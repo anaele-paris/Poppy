@@ -272,13 +272,27 @@ def interpolate_skeletons(skeletons, factor=1):
 
     return new_skeletons
 
-def preprocess_skeletons(skeletons, topology, ref_joint = 0 , alpha= np.pi/4*3 , smoothing_n=4, interpolation_factor = 1 ):
+def preprocess_skeletons(skeletons, topology, angle= None , ref_joint = None , smoothing_n=5, interpolation_factor = 1 ):
     '''
     Function to process skeletons from video to poppy format skeletons
+    Inputs:
+    - skeletons : torch tensor [n_frames, n_joints, 3] : skeletons in (x,y,z) format
+    - topology : list with the connections between joints (child-parent relations)
+    - angle : None or float : angle of rotation in radians (Pi/2 for 90° for example)
+        angle = np.pi/4 for 45° rotation (Mai1.mov) or angle = np.pi/4*3 for 135° rotation (anaele_1.jpg)
+    - ref_joint : None or int : reference joint to center the skeleton (default is None)
+        Note : Rotate_skeleton and reorient_skeleton functions center the skeleton on the pelvis (joint 0)
+    - smoothing_n : int : number of frames to use for moving average smoothing (défault = 5)
+    - interpolation_factor : float : factor to interpolate the number of frames (if factor = 2, doubles the number of frames)
     '''
     preprocessed_skeletons = reorder_axes(skeletons)
-    preprocessed_skeletons = rotate_skeletons(preprocessed_skeletons, alpha, topology)
-    preprocessed_skeletons = center_skeletons(preprocessed_skeletons, ref_joint=ref_joint)
+    if angle is None:
+        preprocessed_skeletons = rotate_skeletons(preprocessed_skeletons, 0, topology)
+        preprocess_skeletons = reorient_skeleton(preprocessed_skeletons, topology)
+    else:
+        preprocessed_skeletons = rotate_skeletons(preprocessed_skeletons, angle, topology)
+    if ref_joint is not None:
+        preprocessed_skeletons = center_skeletons(preprocessed_skeletons, ref_joint=ref_joint)
     preprocessed_skeletons = smoothen_skeleton_mooving(preprocessed_skeletons, n=smoothing_n)
     preprocessed_skeletons = interpolate_skeletons(preprocessed_skeletons, factor=interpolation_factor)
 
@@ -377,6 +391,13 @@ def plot_3d_hand_trajectory(targets, period=20, title='Targets -'):
     # Create a 3D plot
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
+    
+    max_value = targets.max(axis=2).values.numpy()
+    min_value = targets.min(axis=2).values.numpy()
+    limit = np.max([max_value, -min_value])
+    ax.set_xlim([-limit, limit])
+    ax.set_ylim([-limit, limit])
+    ax.set_zlim([-limit, limit])
     
     # Extracting the coordinates for both lines
     x1, y1, z1 = targets[:, 0, 0], targets[:, 0, 1], targets[:, 0, 2]
