@@ -57,19 +57,25 @@ class PoppyEnv(gym.Env):
 
         # Define Poppy's moovements limits (possible angles for each joints)
         self.joints_limits = {
-            'l_elbow_y': (-60, 90),
+            # 'l_elbow_y': (-60.0, 90.0),
+            'l_elbow_y': (-5.0, 90.0),
             'head_y': (0.0, 0.0),
             'r_arm_z': (-50.0, 60.0),
             'head_z': (0.0, 0.0),
-            'r_shoulder_x': (0.0, 180.0),
-            'r_shoulder_y': (-210.0, 65.0),
-            'r_elbow_y': (-60.0, 90.0),
+            # 'r_shoulder_x': (-180.0, 15.0),
+            'r_shoulder_x': (-90.0, 5.0),
+            # 'r_shoulder_y': (-210.0, 65.0),
+            'r_shoulder_y': (-90.0, 5.0),
+            # 'r_elbow_y': (-60.0, 90.0),
+            'r_elbow_y': (-5.0, 90.0),
             'l_arm_z': (-50.0, 60.0),
             'abs_z': (0.0, 0.0),
             'bust_y': (0.0, 0.0),
             'bust_x': (0.0, 0.0),
-            'l_shoulder_x': (0.0, 180.0),
-            'l_shoulder_y': (-210.0, 65.0),
+            # 'l_shoulder_x': (-15.0, 180.0),
+            'l_shoulder_x': (-5.0, 90.0),
+            # 'l_shoulder_y': (-210.0, 65.0),
+            'l_shoulder_y': (-90.0, 5.0),
         }
         self.low_limits = np.array(
             [lim[0] for lim in self.joints_limits.values()], dtype=np.float32)
@@ -89,7 +95,7 @@ class PoppyEnv(gym.Env):
         self.infos = []
 
         self.episodes = 0  # used for resetting the sim every so often
-        self.restart_every_n_episodes = 1000
+        self.restart_every_n_episodes = 5
 
         super().__init__()
 
@@ -134,17 +140,17 @@ class PoppyEnv(gym.Env):
         Out put : None
         Note poppy_goto(joints_reset) is equivalent to poppy_reset()
         '''
-        def scale_value(value, min_in, max_in, min_out, max_out):
-            # Mise à l'échelle de la valeur d'entrée
-            scaled_value = (value - min_in) / (max_in - min_in)
-            # Transformation à la plage de sortie
-            scaled_value = scaled_value * (max_out - min_out) + min_out
-            return scaled_value
-        print("joints_to_move : ", joints_to_move)
+        # def scale_value(value, min_in, max_in, min_out, max_out):
+        #     # Mise à l'échelle de la valeur d'entrée
+        #     scaled_value = (value - min_in) / (max_in - min_in)
+        #     # Transformation à la plage de sortie
+        #     scaled_value = scaled_value * (max_out - min_out) + min_out
+        #     return scaled_value
+        # print("joints_to_move : ", joints_to_move)
         for i, m in enumerate(self.poppy.motors):
             if not np.isnan(joints_to_move[i]) and self.action_space.high[i] - self.action_space.low[i] != 0:
-                print(
-                    m.name, self.action_space.low[i], self.action_space.high[i])
+                # print(
+                #     m.name, self.action_space.low[i], self.action_space.high[i])
                 action = (joints_to_move[i]+1)/2 * (self.action_space.high[i] -
                                                     self.action_space.low[i]) + self.action_space.low[i]
                 # if joints_to_move[i] > 0 and self.action_space.high[i] != 0:
@@ -158,7 +164,7 @@ class PoppyEnv(gym.Env):
                 #     joints_to_move[i], -1, 1, self.action_space.low[i], self.action_space.high[i])
                 # if action >= self.action_space.low[i] and action <= self.action_space.high[i]:
                 # wait=False to allow parallel movements
-                print(m.name, joints_to_move[i], action)
+                # print(m.name, joints_to_move[i], action)
                 # m.goto_position(joints_to_move[i], 3, wait=False)
                 m.goto_position(action, 3, wait=False)
 
@@ -231,7 +237,7 @@ class PoppyEnv(gym.Env):
 
     def reset(self, seed=None, **kwargs):
         '''reset Poppy to the initial state'''
-        print("coucou")
+        # print("coucou")
         if seed is not None:
             np.random.seed(seed)
         joint_pos = {'l_elbow_y': 0.0,  # if 90 will reset with arms straight along hips
@@ -265,10 +271,10 @@ class PoppyEnv(gym.Env):
                     self.poppy.r_arm_chain.position]
 
         info = {}
-        print("Initial state:", obs)
+        # print("Initial state poppy:", obs)
         return np.float32(obs), info
 
-    def reward(self, obs, target, threshold=0.3, alpha=10):
+    def reward(self, obs, target, threshold=0.3, alpha=2):
         '''Basic Reward function for the PoppyEnv returns value between [0, 1] based on the distance
         between the end effectors observations and their targets
         Note 1 : exponetial (- alpha * distance) transforms a distance [0 , inf] into a similarity score [0, 1]
@@ -322,11 +328,12 @@ class PoppyEnv(gym.Env):
         # calculate the reward (based on similarity of end effectors positions with targets)
         # Note: reward function could penalise moovements that Poppy cannot do using l_joints_obs and r_joints_obs....
         reward = self.reward(obs, self.targets[self.current_step])
+        print("episode : ", self.episodes+1)
+        print("current step : ", self.current_step)
         print("reward : ", reward)
 
         # Update current step, info and episode
-        self.current_step += 1
-        print("current step : ", self.current_step)
+        self.current_step += 5
 
         info = {'episode': self.episodes+1,
                 'step': self.current_step,
@@ -336,7 +343,10 @@ class PoppyEnv(gym.Env):
         self.done = (self.current_step >= self.num_steps)
         if self.done:
             self.episodes += 1
-        print("episode : ", self.episodes)
+
+        # print('obs poppy', obs)
+        # print('target anaele', self.targets[self.current_step][13].numpy(
+        # ), self.targets[self.current_step][16].numpy())
 
         truncated = False
         info = {}
@@ -367,14 +377,22 @@ class PoppyEnv(gym.Env):
     #     self.targets = smoothed_targets
 
     # extraction of the targets
+    # def get_target(self):
+    #     '''Get target from skeletons saved in ./resources/sample_poppy_skeletons/'''
+    #     path = "./resources/sample_poppy_skeletons/"
+    #     files = os.listdir(path)
+    #     for file in files:
+    #         if file.endswith("poppy_skeletons.pt"):
+    #             print("loading targets from : ", file)
+    #             self.targets = torch.load(path+file)
+    #             break
+
+    #     return self.targets
+
     def get_target(self):
         '''Get target from skeletons saved in ./resources/sample_poppy_skeletons/'''
         path = "./resources/sample_poppy_skeletons/"
-        files = os.listdir(path)
-        for file in files:
-            if file.endswith("poppy_skeletons.pt"):
-                print("loading targets from : ", file)
-                self.targets = torch.load(path+file)
-                break
-
-        # return self.get_targets_from_skeleton(self,
+        file = 'anaele_bent_arms_0_poppy_skeletons.pt'  # files[0]
+        print("loading targets from : ", file)
+        self.targets = torch.load(path+file)
+        return self.targets
