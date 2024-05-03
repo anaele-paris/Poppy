@@ -1,0 +1,34 @@
+Using cpu device
+c:\users\anaele.baudant\onedrive - befive\_master ia\_cours\ia705 apprentissage pour la robotique\poppy\venv\lib\site-packages\stable_baselines3\common\policies.py:400: RuntimeWarning: invalid value encountered in divide
+  return 2.0 * ((action - low) / (high - low)) - 1.0
+reward :  0.7158832631049405
+current step :  5
+episode :  0
+reward :  0.0
+current step :  10
+episode :  0
+reward :  0.7172905922608287
+current step :  15
+episode :  0
+reward :  0.4112732612575547
+current step :  20
+episode :  0
+reward :  0.0
+current step :  25
+episode :  0
+reward :  1.920737984282976
+current step :  30
+episode :  0
+reward :  0.0
+current step :  35
+episode :  0
+reward :  2.0638022898148787
+current step :  40
+episode :  0
+reward :  0.8047993179033655
+...
+episode :  7
+reward :  1.5431506786734837
+current step :  60
+episode :  7
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
