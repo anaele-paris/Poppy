@@ -28,6 +28,7 @@ class PoppyEnv(gym.Env):
         from pypot import vrep
         vrep.close_all_connections()
         self.poppy = PoppyTorso(simulator='vrep')
+        self.file = ''
 
         # define Poppy's topology and lengths
         self.topology = [0, 0, 1, 2, 0, 4, 5, 0, 7, 8, 9, 8, 11, 12, 8, 14, 15]
@@ -298,17 +299,21 @@ class PoppyEnv(gym.Env):
 
         return reward
       
-    def get_target(self):
+    def get_target(self, file_name="./resources/sample_poppy_skeletons/anaele_bent_arms_1_test_poppy_skeletons.pt"):
         '''Get target from skeletons saved in ./resources/sample_poppy_skeletons/'''
-        path = "./resources/sample_poppy_skeletons/"
+        #path = "./resources/sample_poppy_skeletons/"
         # files = os.listdir(path)
-        file = 'anaele_bent_arms_0_poppy_skeletons.pt' # files[0]
+        #file = 'anaele_bent_arms_1_test_poppy_skeletons.pt' # files[0]
+        self.file = file_name
               
-        if file.endswith("poppy_skeletons.pt"):
-            print("loading targets from : ", file)
-            self.targets = torch.load(path+file)
+        if (self.file).endswith("poppy_skeletons.pt"):
+            print("loading targets from : ", self.file)
+            self.targets = torch.load(self.file)
         else:
             print("File must be in a poppy skeletons format")
+
+        self.num_steps = self.targets.shape[0]-1 # must be set to self.targets.shape[0] when target is defined
+
     
     def step(self, action):
         '''entrainement d'un step avec calcul error (distance) et reward
