@@ -8,7 +8,7 @@ This project is carried out in the context of the Artificial Intelligence Master
 
 ## Project
 
-Creation of a virtual environment with Coppelia Sim dedicated to make a robot executing some tasks.
+Creation of a virtual environment with Coppelia Sim dedicated to make a robot executing some tasks using Reinforcement Learning (RL).
 
 ## How to setup?
 
@@ -48,11 +48,14 @@ py -m pip install -r requirements.txt
 
 - Once the project and environment are setup, you can launch it by opening **sujet_upper_body_imitation.ipynb** with __Visual Studio__ or __Jupyter__.
 
-- (You have to link your **Visual Studio** or **Jupyter** with your created environment)
+- (You have to link your **Visual Studio** or **Jupyter** with your created environment using Python v3.8.10)
 
-- Launch Coppelia Sim on your computer and open the specific scene __REMOTE_API_TEMPFILE_6057__ located at __./Poppy/scenes/REMOTE_API_TEMPFILE_6057.ttt__.
+- Launch Coppelia Sim on your computer on a new scene.
 
-- You can execute now cells inside your notebook to make some changes on your Coppelia Sim.
+- You can execute now cells from your notebook "src/Poppy_RL.ipynb" to execute code on your Coppelia Sim environement.
+
+
+__Note: Do not forget to restart Python Kernel after modifying Poppy_Env.__
 
 ## Ressources
 
