@@ -2,7 +2,9 @@
 
 ![poppy](https://github.com/PierreBio/Poppy/assets/45881846/b8e52bd4-a2ce-4758-8147-6c9afbb46cbb)
 
-This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis**.
+This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis & ENSTA** in the "Learning for Robotics" class of Mai NGUYEN & Damien BOUCHABOU.
+
+This project has been conducted by Anaële BAUDANT-COJAN, Pierre BILLAUD and Edouard DUCLOY of the 2023-2024 AI Master. 
 
 <sub>Made with __Python v3.8.10__ and __Coppelia Sim__ </sub>
 
